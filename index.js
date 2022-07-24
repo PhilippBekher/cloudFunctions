@@ -132,25 +132,27 @@ exports.FirstMatchDuringAccountCreating = functions.firestore
      const data = {
      users:[ doc.ref,change.before.ref ]
      }
+
      await admin.firestore().collection('matches').doc(`${Date.now()}`).set(data)
      console.log(doc.id, '=>', doc.data());
 
-     await doc.ref.update({'status':'unactive'})
-     await doc.ref.update({
-      MatchedUsersIDs: admin.firestore.FieldValue.arrayUnion(change.before.id)
-    });
-    await doc.ref.update({'current_match': change.before.ref})
-    await doc.ref.update({'MatchPresence':true})
-    await doc.ref.update({'WaitingForMatch':'notWaiting'})
+     await doc.ref.update({'status':'unactive',
+     MatchedUsersIDs: admin.firestore.FieldValue.arrayUnion(change.before.id),
+     'current_match': change.before.ref,
+     'MatchPresence':true,
+     'WaitingForMatch':'MatchFound',
+     'buttonForSearchingPressed':'alreadyTriggered'
+    })
+    
 
-     await change.before.ref.update({'status':'unactive'})
+
      await change.before.ref.update({
-      MatchedUsersIDs: admin.firestore.FieldValue.arrayUnion(doc.id)
-    });
-    await change.before.ref.update({'current_match': doc.ref })
-    await change.before.ref.update({'MatchPresence':true})
-    await change.before.ref.update({'WaitingForMatch':'notWaiting'})
-
+    'status':'unactive',
+     MatchedUsersIDs: admin.firestore.FieldValue.arrayUnion(doc.id),
+     'current_match': doc.ref,
+     'MatchPresence':true,
+     'WaitingForMatch':'MatchFound',
+     'buttonForSearchingPressed':'alreadyTriggered'})
    });
    } 
 });
